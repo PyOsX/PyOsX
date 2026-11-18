@@ -1,3 +1,6 @@
+from parser import ParseError, parse_command
+
+
 def shell_loop():
     """Main interactive loop of PyOsX."""
 
@@ -6,21 +9,29 @@ def shell_loop():
 
     while True:
         try:
-            # 1. Display the prompt and read user input
             command = input("pyosx> ")
 
-            # 2. Ignore empty commands
             if not command.strip():
                 continue
 
-            # 3. Temporary output for testing the REPL
-            print(f"Command received: {command}")
+            try:
+                tokens = parse_command(command)
+
+                if not tokens:
+                    continue
+
+                # Temporary output for parser testing
+                print(
+                    "Parsed tokens:",
+                    [(token.kind, token.value) for token in tokens]
+                )
+
+            except ParseError as error:
+                print(f"pyosx: syntax error: {error}")
 
         except KeyboardInterrupt:
-            # Ctrl+C: return to the prompt
             print("\nUse Ctrl+D to exit.")
 
         except EOFError:
-            # Ctrl+D: exit the shell
             print("\nGoodbye!")
             break
